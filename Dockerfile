@@ -1,11 +1,14 @@
 FROM python:3.12-slim
-RUN pip install uv
 
-COPY requirements.txt .
-
-RUN uv pip install --system -r requirements.txt
-
-COPY . /app
+# Définir le répertoire de travail
 WORKDIR /app
 
+# Copier requirements et installer les dépendances
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copier tout le reste du projet dans /app
+COPY . /app
+
+# Commande par défaut
 CMD ["python", "-u", "main.py"]

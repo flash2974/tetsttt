@@ -69,7 +69,7 @@ def main():
     
     # Fusionner toutes les moyennes dans un seul DataFrame si besoin
     merged_means = pd.concat(all_means, ignore_index=True)
-    merged_means.to_csv("moyennes_eraclito91.csv", index=False)
+    merged_means.to_csv("data/moyennes_eraclito91.csv", index=False)
     print("Fichier CSV final généré.")
 
 if __name__ == "__main__":

@@ -67,18 +67,19 @@ def main():
                 
                 # Crée un DataFrame ligne unique pour cet ID
                 df_mean = pd.DataFrame([mean_values])
-                df_mean["ID"] = id
+                df_mean["Code"] = id
                 all_means.append(df_mean)
                 
                 print(f"Moyenne calculée pour ID {id}")
-            print(f"OK pour {id}")
     
     # Fusionner toutes les lignes ID
     merged_means = pd.concat(all_means, ignore_index=True)
     
-    # Sauvegarde dans CSV
-    merged_means.to_csv("data/moyennes_eraclito91.csv", index=False)
-    print("Fichier CSV final généré.")
+    df_merged_final = pd.merge(merged_means, df_other, on="Code", how="left")
+    
+    # Sauvegarde
+    df_merged_final.to_csv("data/merged_final.csv", index=False)
+
 
 if __name__ == "__main__":
     main()

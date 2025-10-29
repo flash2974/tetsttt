@@ -73,8 +73,8 @@ def main():
                 print(f"Moyenne calculée pour ID {id}")
     
     # Fusionner toutes les lignes ID
-    merged_means = pd.concat(all_means, ignore_index=True)
-    
+    merged_means = pd.concat(all_means, ignore_index=True) # notre super csv avec les données météo des moyennes sur toutes les années
+    df_other = pd.read_csv("data.csv") # le csv avec touuutes les données des cases laa
     df_merged_final = pd.merge(merged_means, df_other, on="Code", how="left")
     
     # Sauvegarde

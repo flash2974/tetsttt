@@ -1,0 +1,9 @@
+version: '3.9'
+
+services:
+  eraclito91_downloader:
+    build: .
+    container_name: eraclito91_downloader
+    restart: unless-stopped
+    volumes:
+      - ./data:/app

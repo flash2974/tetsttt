@@ -25,9 +25,7 @@ def download_and_unzip(url):
 def download_for_id_year(id, year):
     url = f"https://dati-simc.arpae.it/opendata/eraclito91/timeseries/{id:05d}/{id:05d}_{year}.zip"
     try:
-        df = download_and_unzip(url)
-        df["ID"] = id
-        return df
+        return download_and_unzip(url)
     except Exception as e:
         print(f"Erreur pour {id:05d}_{year}: {e}")
         return None
@@ -51,30 +49,36 @@ def main():
     
     all_means = []
     with ThreadPoolExecutor(max_workers=8) as executor:
-      for id in ids:
-          futures = [executor.submit(download_for_id_year, id, year) for year in range(1992, 2025)]
-          
-          dfs = []
-          for future in as_completed(futures):
-              df = future.result()
-              if df is not None:
-                  dfs.append(df)
-          
-          if dfs:
-              df_mean = sum(df.iloc[:, -3:] for df in dfs) / len(dfs)
-              df_mean["ID"] = id
-              all_means.append(df_mean)
-              print(f"Moyenne calculée pour ID {id}")
-          print(f"OK pour {id}")
+        for id in ids:
+            futures = [executor.submit(download_for_id_year, id, year) for year in range(1992, 2025)]
+            
+            dfs = []
+            for future in as_completed(futures):
+                df = future.result()
+                if df is not None:
+                    dfs.append(df)
+            
+            if dfs:
+                # Concat toutes les années pour cet ID
+                df_concat = pd.concat(dfs, ignore_index=True)
+                
+                # Moyenne des 3 dernières colonnes
+                mean_values = df_concat.iloc[:, -3:].mean()
+                
+                # Crée un DataFrame ligne unique pour cet ID
+                df_mean = pd.DataFrame([mean_values])
+                df_mean["ID"] = id
+                all_means.append(df_mean)
+                
+                print(f"Moyenne calculée pour ID {id}")
+            print(f"OK pour {id}")
     
-    # Fusionner toutes les moyennes dans un seul DataFrame si besoin
+    # Fusionner toutes les lignes ID
     merged_means = pd.concat(all_means, ignore_index=True)
+    
+    # Sauvegarde dans CSV
     merged_means.to_csv("data/moyennes_eraclito91.csv", index=False)
     print("Fichier CSV final généré.")
 
 if __name__ == "__main__":
     main()
-
-
-    
-
